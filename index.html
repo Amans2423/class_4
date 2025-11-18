@@ -1,196 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Class 4 Computer Homework</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #333;
-      color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #FFB6C1;
-      color: white;
-      text-align: center;
-      padding: 10px 0;
-    }
-    h1 {
-      font-size: 2.5em;
-      margin: 0;
-    }
-    .content {
-      margin: 20px;
-      padding: 20px;
-      background-color: #444;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    }
-    .question {
-      font-weight: bold;
-      color: #FFEB3B;
-      font-size: 1.5em;
-      margin-top: 30px;
-    }
-    .how-to {
-      font-size: 1.1em;
-      color: #ddd;
-      margin-top: 10px;
-    }
-    .example {
-      background-color: #F0F8FF;
-      color: #000;
-      padding: 10px;
-      margin: 10px 0;
-      border-left: 5px solid #2980b9;
-      border-radius: 6px;
-    }
-    footer {
-      text-align: center;
-      padding: 10px;
-      background-color: #FFB6C1;
-      color: white;
-    }
-    .lock-screen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.85);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      z-index: 9999;
-      color: white;
-    }
-    .lock-screen input {
-      padding: 10px;
-      font-size: 18px;
-      border: none;
-      border-radius: 8px;
-      margin-top: 10px;
-      width: 250px;
-      text-align: center;
-    }
-    .lock-screen button {
-      margin-top: 15px;
-      padding: 10px 20px;
-      font-size: 18px;
-      background-color: #4caf50;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .lock-screen button:hover {
-      background-color: #388e3c;
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Computer Adventure Game – Fixed</title>
+<style>
+  :root{--accent:#0088dd;--good:#28a745;--bad:#dc3545}
+  body{font-family:Inter, Poppins, system-ui, sans-serif;background:linear-gradient(180deg,#8ed6ff,#c9f1ff);padding:12px;margin:0}
+  h1{text-align:center;color:#003f66;margin:6px 0 12px}
+  .screen{max-width:920px;margin:0 auto;background:rgba(255,255,255,0.95);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.12)}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .player{font-weight:600}
+  .score{font-weight:700;background:#fff;border-radius:8px;padding:6px 10px;border:2px solid #eee}
+  .level-title{text-align:center;font-size:20px;margin:8px 0;color:#004d73;font-weight:700}
+  .progress-bar{height:14px;background:#eee;border-radius:10px;overflow:hidden;margin:8px 0}
+  .progress-inner{height:100%;width:0;background:linear-gradient(90deg,#6bd26b,#00a86b);transition:width .35s}
+  .question-box{background:#eaf6ff;padding:16px;border-radius:10px;font-size:18px;margin-bottom:12px}
+  .options label{display:block;padding:10px 12px;background:#fff;margin:8px 0;border-radius:10px;cursor:pointer;border:2px solid #e6f4ff;font-size:16px}
+  .options label:hover{background:#f6fbff}
+  .correct{background:var(--good)!important;border-color:green!important}
+  .wrong{background:var(--bad)!important;border-color:darkred!important}
+  .explain{padding:12px;background:#fff3c4;border-radius:8px;margin-top:10px;font-size:15px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .pbtn{background:#ffb300;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+  .pbtn[disabled]{opacity:.5;cursor:default}
+  .name-input{padding:10px;border-radius:8px;border:2px solid #cfe;min-width:180px}
+  .chars{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:8px 0}
+  .char{background:#fff;padding:8px 12px;border-radius:8px;border:2px solid #e3eefc;cursor:pointer}
+  .char.selected{border-color:var(--accent);background:#eaf6ff}
+  .world-map{display:flex;gap:12px;justify-content:center;font-size:28px;margin:10px 0}
+  .hidden{display:none}
+  .report{margin-top:12px}
+  .report table{width:100%;border-collapse:collapse}
+  .report th,.report td{padding:8px;border:1px solid #eee;text-align:left}
+
+  @media (max-width:600px){
+    .screen{padding:12px}
+    .question-box{font-size:16px}
+    .options label{font-size:15px;padding:10px}
+    .name-input{width:100%}
+    .chars{gap:6px}
+  }
+</style>
 </head>
 <body>
+  <h1>Computer Adventure Game</h1>
+  <div class="screen" id="game"></div>
 
-<!-- Lock screen -->
-<div class="lock-screen" id="lockScreen">
-  <h2>🔒 Enter Passkey to Continue</h2>
-  <input type="password" id="passwordInput" placeholder="Enter Passkey">
-  <button onclick="checkPassword()">Unlock</button>
-  <p id="errorMsg" style="color: red; margin-top: 10px;"></p>
-</div>
-
-<header>
-  <h1>Class 4 Computer Homework</h1>
-</header>
-
-<div class="content">
-  <h2>📘 Homework</h2>
-
-  <p class="question">1️⃣ Why is a Computer Called a Machine?</p>
-  <div class="how-to">
-    <p>💡 A machine helps us do work easily. Just like:</p>
-    <div class="example">
-      <h3>✅ Simple Explanation</h3>
-      <ul>
-        <li>🌀 A fan cools the room</li>
-        <li>🧺 Washing machine washes clothes</li>
-        <li>🖥️ Computer helps us write, draw, play!</li>
-      </ul>
-      <p>➡️ So, a computer is also a machine.</p>
-    </div>
-
-    <div class="example">
-      <h3>🔍 Deeper Explanation</h3>
-      <ul>
-        <li>💻 Computer works with electricity</li>
-        <li>🧠 It follows our instructions</li>
-        <li>🔄 Works automatically, doesn’t get tired</li>
-      </ul>
-    </div>
-
-    <div class="example">
-      <h3>🎥 Video Recording Steps</h3>
-      <ol>
-        <li>Say: “Hello! My name is [Your Name]. Today I will tell you why a computer is a machine.”</li>
-        <li>Use real machine examples: fan, washing machine, etc.</li>
-        <li>Show your computer and explain</li>
-        <li>Finish: “Thank you for watching!”</li>
-      </ol>
-    </div>
-  </div>
-
-  <p class="question">3️⃣ IPO Cycle (Input – Process – Output)</p>
-  <div class="how-to">
-    <div class="example">
-      <h3>✅ Simple Example (Drawing)</h3>
-      <ul>
-        <li>✍️ <strong>Input:</strong> Crayons and paper</li>
-        <li>🖌️ <strong>Process:</strong> Drawing</li>
-        <li>🖼️ <strong>Output:</strong> Beautiful picture</li>
-      </ul>
-    </div>
-
-    <div class="example">
-      <h3>🔍 Deeper Example (Game)</h3>
-      <ul>
-        <li>🎮 <strong>Input:</strong> Pressing keys</li>
-        <li>🧠 <strong>Process:</strong> Computer checks & moves player</li>
-        <li>📺 <strong>Output:</strong> Player moves on screen</li>
-      </ul>
-    </div>
-
-    <div class="example">
-      <h3>🎥 Video Recording Steps</h3>
-      <ol>
-        <li>Say: “Hello! Today I will show you the IPO cycle using drawing.”</li>
-        <li>Show crayons and say: “Input: These are my crayons and paper.”</li>
-        <li>Draw and say: “Process: I am drawing.”</li>
-        <li>Show result: “Output: This is my drawing!”</li>
-        <li>Smile and say: “Thank you for watching!”</li>
-      </ol>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <p>&copy; 2025 Class 4 Computer Homework</p>
-</footer>
+  <!-- Sounds -->
+  <audio id="bgMusic" src="https://files.catbox.moe/8p9l0n.mp3" loop preload="auto"></audio>
+  <audio id="tick" src="https://assets.mixkit.co/sfx/preview/mixkit-big-bell-1.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="https://assets.mixkit.co/sfx/preview/mixkit-video-game-win-2016.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-voice-buzzer-948.mp3" preload="auto"></audio>
 
 <script>
-  function checkPassword() {
-    const correctPassword = "think";
-    const enteredPassword = document.getElementById("passwordInput").value;
-    const errorMsg = document.getElementById("errorMsg");
-
-    if (enteredPassword === correctPassword) {
-      document.getElementById("lockScreen").style.display = "none";
-    } else {
-      errorMsg.textContent = "❌ Incorrect Passkey! Try again.";
-      document.getElementById("passwordInput").value = '';
-    }
+// ---------- DATA ----------
+const levels = [
+  {
+    name:'Level 1 - Tux Paint Basics', icon:'🎨', questions:[
+      {q:'Tux Paint is mainly used for ______.', opts:['Drawing','Music','Internet','Games'], ans:'drawing', exp:'Tux Paint is a drawing software for kids.'},
+      {q:'Which tool adds ready-made stickers in Tux Paint?', opts:['Lines','Stamp','Text','Undo'], ans:'stamp', exp:'Stamp tool adds stickers and shapes.'},
+      {q:'Magic Tool is used for ______ effects.', opts:['Sound','Painting','Special','Typing'], ans:'special', exp:'Magic tool adds special painting effects.'},
+      {q:'Eraser tool helps to ______.', opts:['Draw','Erase','Color','Type'], ans:'erase', exp:'Eraser removes parts of a drawing.'},
+      {q:'The Save button stores your ______.', opts:['Music','Drawing','Game','Video'], ans:'drawing', exp:'Save stores your artwork.'}
+    ]
+  },
+  {
+    name:'Level 2 - Keyboard Skills', icon:'⌨️', questions:[
+      {q:'Spacebar key adds a ______.', opts:['Letter','Line','Space','Number'], ans:'space', exp:'Spacebar inserts a space between words.'},
+      {q:'Shift key is used to type ______ letters.', opts:['Small','Capital','Blue','Hidden'], ans:'capital', exp:'Shift + letter makes capital letters.'},
+      {q:'Enter key moves the cursor to new ______.', opts:['Page','Line','File','Tab'], ans:'line', exp:'Enter jumps to a new line.'},
+      {q:'Number keys type ______.', opts:['Colors','Digits','Folders','Pictures'], ans:'digits', exp:'Number keys are for digits.'},
+      {q:'Arrow keys help in ______.', opts:['Navigation','Painting','Sleeping','Printing'], ans:'navigation', exp:'Arrow keys move the cursor in directions.'}
+    ]
+  },
+  {
+    name:'Level 3 - Logo Turtle Commands', icon:'🐢', questions:[
+      {q:'FD 50 makes the turtle move ______.', opts:['Backward','Forward 50 steps','Right','Left'], ans:'forward 50 steps', exp:'FD means forward movement.'},
+      {q:'RT 90 will turn turtle ______.', opts:['Left 90°','Right 90°','Up','Down'], ans:'right 90°', exp:'RT means turn right.'},
+      {q:'BK 40 moves turtle ______.', opts:['Forward','Backward','Side','Up'], ans:'backward', exp:'BK means backward movement.'},
+      {q:'LT command turns the turtle ______.', opts:['Right','Left','Back','Round'], ans:'left', exp:'LT means turn left.'},
+      {q:'REPEAT 4 [FD 50 RT 90] draws a ______.', opts:['Circle','Square','Triangle','Line'], ans:'square', exp:'This repeats 4 sides turning 90° to make a square.'}
+    ]
+  },
+  {
+    name:'Level 4 - Internet Basics', icon:'🌐', questions:[
+      {q:'Internet connects many ______.', opts:['Computers','Animals','Cars','Houses'], ans:'computers', exp:'Internet is a network of computers.'},
+      {q:'A web browser helps you ______ the web.', opts:['Eat','Browse','Sleep','Drive'], ans:'browse', exp:'Browsers allow you to surf the internet.'},
+      {q:'Google is a ______.', opts:['Search engine','Game','Keyboard','Virus'], ans:'search engine', exp:'Google helps search information.'},
+      {q:'Email is used to send ______.', opts:['Food','Messages','Water','Movies'], ans:'messages', exp:'Email is for sending messages online.'},
+      {q:'Wi-Fi helps connect to ______.', opts:['Books','Internet','Trees','Games'], ans:'internet', exp:'Wi-Fi provides wireless internet access.'}
+    ]
+  },
+  {
+    name:'Level 5 - Final Mixed Test', icon:'🏁', questions:[
+      {q:'Stamp tool is found in ______.', opts:['Logo','Tux Paint','Notepad','Calculator'], ans:'tux paint', exp:'Stamp tool belongs to Tux Paint.'},
+      {q:'FD means ______ in Logo.', opts:['Forward','Fast Down','File Download','Far Distance'], ans:'forward', exp:'FD means Forward.'},
+      {q:'Shift key helps in typing ______ letters.', opts:['Capital','Small','Random','Green'], ans:'capital', exp:'Shift creates capital letters.'},
+      {q:'Internet lets you ______ online.', opts:['Draw','Browse information','Drive','Cook'], ans:'browse information', exp:'Internet helps find information.'},
+      {q:'RT makes the turtle turn ______.', opts:['Right','Left','Up','In'], ans:'right', exp:'RT stands for Right Turn.'}
+    ]
   }
-</script>
+];
 
+// ---------- STATE ----------
+let playerName = '';
+let character = '';
+let levelIndex = 0;
+let qIndex = 0;
+let score = 0;
+let report = []; // store each Q result
+
+const game = document.getElementById('game');
+const bgMusic = document.getElementById('bgMusic');
+
+// ---------- HELPERS ----------
+function normalize(s){ return String(s||'').trim().toLowerCase().replace(/[^a-z0-9]/g,''); }
+function play(id){ try{ document.getElementById(id).currentTime=0; document.getElementById(id).play(); }catch(e){}
+}
+
+// ---------- UI SCREENS ----------
+function loadStart(){
+  levelIndex = 0; qIndex = 0; score = 0; report = [];
+  game.innerHTML = `
+    <div class='topbar'><div class='player'>Enter name and choose character</div><div class='score'>Score: <b>0</b></div></div>
+
+    <div style='text-align:center;margin:8px 0'>
+      <input id='pname' class='name-input' placeholder='Your name'>
+    </div>
+
+    <div class='chars'>${['🧒 Boy','👧 Girl','🤖 Robot','🐱 Cat'].map(c=>`<div class='char' onclick="chooseChar(this)">${c}</div>`).join('')}</div>
+
+    <div style='text-align:center;margin-top:12px'>
+      <button class='btn' onclick='startGame()'>Start Adventure</button>
+    </div>
+  `;
+}
+
+function chooseChar(el){
+  document.querySelectorAll('.char').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  character = el.innerText;
+}
+
+function startGame(){
+  const name = document.getElementById('pname').value.trim();
+  if(!name){ alert('Please enter your name'); return; }
+  if(!character){ alert('Please choose a character'); return; }
+  playerName = name;
+  // start bg music (user action triggered)
+  try{ bgMusic.volume = 0.25; bgMusic.play(); }catch(e){}
+  levelIndex = 0; qIndex = 0; score = 0; report = [];
+  renderQuestion();
+}
+
+// ---------- RENDER QUESTION ----------
+function renderQuestion(){
+  const level = levels[levelIndex];
+  const q = level.questions[qIndex];
+
+  // progress for this level
+  const progress = Math.round((qIndex / level.questions.length) * 100);
+
+  // build options
+  const optionsHtml = q.opts.map(opt => `<label onclick='handleAnswer(this)'>${opt}</label>`).join('');
+
+  game.innerHTML = `
+    <div class='topbar'><div class='player'>Player: <b>${playerName}</b> — ${character}</div>
+    <div class='score'>Score: <b>${score}</b></div></div>
+
+    <div class='level-title'>${level.icon} ${level.name}</div>
+    <div class='progress-bar'><div class='progress-inner' style='width:${progress}%'></div></div>
+    <div class='question-box'>${q.q}</div>
+    <div class='options'>${optionsHtml}</div>
+
+    <div class='controls'>
+      <button class='pbtn' id='extraBtn' onclick='useExtra()'>⏱ Extra Time</button>
+      <button class='pbtn' id='skipBtn' onclick='useSkip()'>⏭ Skip</button>
+      <button class='pbtn' id='fiftyBtn' onclick='useFifty()'>5️⃣0️⃣-5️⃣0️⃣</button>
+    </div>
+  `;
+}
+
+// ---------- ANSWER HANDLING ----------
+function handleAnswer(labelEl){
+  // prevent double clicks
+  if(labelEl.dataset.done) return;
+  labelEl.dataset.done = '1';
+
+  const level = levels[levelIndex];
+  const q = level.questions[qIndex];
+  const chosenRaw = labelEl.innerText.trim();
+  const chosen = normalize(chosenRaw);
+  const correct = normalize(q.ans);
+
+  // mark options visually
+  document.querySelectorAll('.options label').forEach(l=>{
+    const n = normalize(l.innerText);
+    if(n === correct) l.classList.add('correct');
+    if(l === labelEl && n !== correct) l.classList.add('wrong');
+    l.style.pointerEvents = 'none';
+  });
+
+  // scoring
+  const wasCorrect = (chosen === correct);
+  if(wasCorrect) { score += 1; play('correctSound'); }
+  else { play('wrongSound'); }
+
+  // record for report
+  report.push({ level: level.name, question: q.q, selected: chosenRaw, correct: q.ans, correctFlag: wasCorrect });
+
+  // explanation + TTS
+  const explain = document.createElement('div');
+  explain.className = 'explain';
+  explain.innerHTML = `<b>Correct:</b> ${q.ans.toUpperCase()}<br>${q.exp}`;
+  document.querySelector('.options').after(explain);
+  speak(q.exp);
+
+  // update score display instantly
+  const scoreBox = document.querySelector('.score b'); if(scoreBox) scoreBox.innerText = score;
+
+  // proceed to next question after short pause so student sees feedback
+  setTimeout(() => nextQuestion(), 900);
+}
+
+// ---------- NEXT QUESTION & LEVEL FLOW ----------
+function nextQuestion(){
+  const level = levels[levelIndex];
+  qIndex++;
+  if(qIndex >= level.questions.length){
+    // move to next level automatically
+    levelIndex++;
+    if(levelIndex >= levels.length){
+      return finishGame();
+    }
+    qIndex = 0; // start next level first question
+  }
+  renderQuestion();
+}
+
+// ---------- POWER-UPS ----------
+let usedExtra = false, usedSkip = false, usedFifty = false;
+function useExtra(){ if(usedExtra) return alert('Extra Time already used for this level'); usedExtra = true; document.getElementById('extraBtn').disabled = true; alert('Extra time granted (no timer in this mode).'); }
+function useSkip(){ if(usedSkip) return alert('Skip already used for this level'); usedSkip = true; document.getElementById('skipBtn').disabled = true; // record as skipped
+  report.push({ level: levels[levelIndex].name, question: levels[levelIndex].questions[qIndex].q, selected: 'SKIPPED', correct: levels[levelIndex].questions[qIndex].ans, correctFlag: false });
+  // immediate next
+  nextQuestion(); }
+function useFifty(){ if(usedFifty) return alert('50-50 already used for this level'); usedFifty = true; document.getElementById('fiftyBtn').disabled = true;
+  const q = levels[levelIndex].questions[qIndex];
+  const correct = normalize(q.ans);
+  const labels = Array.from(document.querySelectorAll('.options label'));
+  // hide up to half wrong options
+  let wrongs = labels.filter(l=>normalize(l.innerText) !== correct);
+  // remove randomly until ~half remain
+  const toHide = Math.ceil(wrongs.length/2);
+  for(let i=0;i<toHide;i++){ const idx = Math.floor(Math.random()*wrongs.length); wrongs[idx].style.display='none'; wrongs.splice(idx,1); }
+}
+
+// ---------- TTS ----------
+function speak(text){ try{ const msg = new SpeechSynthesisUtterance(text); msg.rate=0.95; speechSynthesis.cancel(); speechSynthesis.speak(msg); }catch(e){} }
+
+// ---------- FINISH & REPORT ----------
+function finishGame(){
+  // compute medal
+  let medal='🥉 Bronze';
+  if(score >= 23) medal='🥇 Gold'; else if(score >= 18) medal='🥈 Silver';
+
+  // build report table
+  let rows = report.map(r => `<tr><td>${r.level}</td><td>${r.question}</td><td>${r.selected}</td><td>${r.correct}</td><td>${r.correctFlag? '✔':'✖'}</td></tr>`).join('');
+
+  game.innerHTML = `
+    <div class='topbar'><div class='player'>Player: <b>${playerName}</b> — ${character}</div>
+    <div class='score'>Final Score: <b>${score}</b></div></div>
+    <div style='text-align:center;margin:8px 0'><h2>🎉 Adventure Complete!</h2><div style='font-size:18px;margin:6px'>Medal: <b>${medal}</b></div></div>
+    <div class='report'><h3>Report card</h3>
+      <table><thead><tr><th>Level</th><th>Question</th><th>Your Answer</th><th>Correct</th><th>OK</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+    <div style='text-align:center;margin-top:12px'><button class='btn' onclick='location.reload()'>Play Again</button></div>
+  `;
+}
+
+// ---------- INIT ----------
+loadStart();
+</script>
 </body>
 </html>
